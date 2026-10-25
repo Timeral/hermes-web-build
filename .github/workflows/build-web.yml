@@ -22,6 +22,11 @@ jobs:
     env:
       ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
     steps:
+      - name: Checkout build assets
+        uses: actions/checkout@v4
+        with:
+          path: build-repo
+
       - name: Checkout upstream Hermes
         uses: actions/checkout@v4
         with:
@@ -41,6 +46,14 @@ jobs:
       - name: Install dependencies
         working-directory: hermes
         run: npm ci
+
+      - name: Restore prepared web public assets
+        working-directory: hermes
+        run: |
+          mkdir -p web/public/ds-assets
+          cp ../build-repo/web-public-extra/ds-assets/filler-bg0.jpg web/public/ds-assets/filler-bg0.jpg
+          cp node_modules/@nous-research/ui/src/fonts/Collapse-*.woff2 web/public/fonts/
+          cp node_modules/@nous-research/ui/src/fonts/Neuebit-Bold.woff2 web/public/fonts/
 
       - name: Build web UI
         working-directory: hermes
