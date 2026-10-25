@@ -50,10 +50,7 @@ jobs:
       - name: Restore prepared web public assets
         working-directory: hermes
         run: |
-          mkdir -p web/public/ds-assets
-          cp ../build-repo/web-public-extra/ds-assets/filler-bg0.jpg web/public/ds-assets/filler-bg0.jpg
-          cp node_modules/@nous-research/ui/src/fonts/Collapse-*.woff2 web/public/fonts/
-          cp node_modules/@nous-research/ui/src/fonts/Neuebit-Bold.woff2 web/public/fonts/
+          cp -a ../build-repo/web-public-extra/. web/public/
 
       - name: Build web UI
         working-directory: hermes
