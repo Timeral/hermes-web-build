@@ -1,0 +1,59 @@
+name: Build Hermes Web UI
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Hermes ref or tag to build (for example v0.22.5)"
+        required: true
+        default: "v0.22.5"
+      node_version:
+        description: "Node.js version"
+        required: true
+        default: "26.12.1"
+
+permissions:
+  contents: read
+
+jobs:
+  build-web:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
+    steps:
+      - name: Checkout upstream Hermes
+        uses: actions/checkout@v4
+        with:
+          repository: NousResearch/hermes-agent
+          ref: ${{ inputs.ref }}
+          path: hermes
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: npm
+          cache-dependency-path: hermes/package-lock.json
+
+      - name: Install dependencies
+        working-directory: hermes
+        run: npm ci
+
+      - name: Build web UI
+        working-directory: hermes
+        run: node scripts/build/web.mjs --source . --icons web/public --out hermes_cli/web_dist
+
+      - name: Show build receipt
+        working-directory: hermes
+        run: cat hermes_cli/web_dist/hermes-build.json
+
+      - name: Upload web dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: hermes-web-dist-${{ inputs.ref }}
+          path: hermes/hermes_cli/web_dist
+          if-no-files-found: error
+          retention-days: 1
