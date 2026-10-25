@@ -44,7 +44,7 @@ jobs:
 
       - name: Build web UI
         working-directory: hermes
-        run: node scripts/build/web.mjs --source . --icons web/public --out hermes_cli/web_dist
+        run: node scripts/build/web.mjs --source . --icons . --out hermes_cli/web_dist
 
       - name: Show build receipt
         working-directory: hermes
